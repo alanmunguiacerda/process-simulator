@@ -7,13 +7,27 @@ const KEY_EVENTS = {
   e: 'setErrorOnRunning',
   p: 'pauseSimulation',
   c: 'startSimulation',
+  n: 'addNewProcess',
 };
+
+const OPERATIONS = ['+', '-', '*', '/', '%'];
+const getRandomInt = (min, max) => {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return Math.floor(Math.random() * Math.floor(max) + min);
+};
+const getRandomOp = () => {
+  return OPERATIONS[getRandomInt(5)];
+}
 
 const bus = new Vue();
 
 const app = new Vue({
   el: '#app',
   data: {
+    nextId: 1,
     batches: [], // Array of batches
     runningBatch: [], // Array of processes
     runningProcess: {}, // process
@@ -37,9 +51,21 @@ const app = new Vue({
 
       array.push([data]);
     },
-    handleAddProcess: function(process, array=this.batches) {
+    handleAddProcess: function(process) {
       if (this.time > 0) return;
       this.addToArray(process, this.batches);
+    },
+    addNewProcess: function() {
+      const newProcess = {
+        opA: getRandomInt(0, 25),
+        op: getRandomOp(),
+        opB: getRandomInt(1, 25),
+        time: getRandomInt(1, 7),
+        eTime: 0,
+        id: this.nextId,
+      };
+      this.nextId += 1;
+      this.addToArray(newProcess, this.batches);
     },
     handleDeleteProcess: function(processId) {
       this.batches.forEach((b, i) => {
@@ -91,9 +117,7 @@ const app = new Vue({
       this.runningProcess = this.runningBatch.shift();
     },
     updateRunningProcess: function() {
-      const eTime = this.runningProcess.eTime
-        ? this.runningProcess.eTime + TICK_VALUE
-        : TICK_VALUE;
+      const eTime = this.runningProcess.eTime + TICK_VALUE;
       this.$set(this.runningProcess, 'eTime', eTime);
       if (this.shouldProcessBeCompleted(this.runningProcess)) {
         this.addToArray(this.runningProcess, this.completedProcesses);
