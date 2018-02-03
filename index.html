@@ -21,25 +21,6 @@
     <div id="app">
       <div class="row">
         <div class="column">
-          <new-process-form 
-            :batches="batches" 
-            v-on:add-process="handleAddProcess"
-          ></new-process-form>
-        </div>
-        <div class="column">
-          <h3>Enqueued batches</h3>
-          <div v-for="(val, key) in batches">
-            <h6>Batch {{ key + 1 }}</h6>
-            <processes-list
-              :processes="val"
-              :is-finished="false"
-              v-on:delete-process="handleDeleteProcess"
-            ></processes-list>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="column">
           <h5>Time elapsed: {{ fixedTime }}</h5>
         </div>
         <div class="column">
@@ -53,11 +34,26 @@
       </div>
       <div class="row">
         <div class="column">
-          <h3>Running batch</h3>
-          <running-batch
-            :processes="runningBatch"
-          ></running-batch>
+          <h3>Enqueued batches</h3>
+          <div v-for="(val, key) in batches">
+            <h6>Batch {{ key + 1 }}</h6>
+            <processes-list
+              :processes="val"
+              :columns="['id', 'time', 'op']"
+              v-on:delete-process="handleDeleteProcess"
+            ></processes-list>
+          </div>
         </div>
+        <div class="column">
+          <h3>Running batch</h3>
+          <processes-list
+            v-if="runningBatch.length"
+            :processes="runningBatch"
+            :columns="['id', 'time', 'remTime']"
+          ></processes-list>
+        </div>
+      </div>
+      <div class="row">
         <div class="column">
           <h3>Running process</h3>
           <running-process
@@ -70,19 +66,19 @@
             <h6>Batch {{ key + 1 }}</h6>
             <processes-list
               :processes="val"
-              :is-finished="true"
+              :columns="['id', 'time', 'remTime', 'opA', 'op', 'opB', 'result']"
             ></processes-list>
           </div>
         </div>
       </div>
     </div>
 
-    <script src="/vue.js"></script>
+    <script src="/vendor/vue.js"></script>
+    <script src="/vendor/keypress.js"></script>
     <script src="/newProcessForm.js"></script>
     <script src="/processesList.js"></script>
-    <script src="/runningBatch.js"></script>
     <script src="/runningProcess.js"></script>
-    <script src="/index.js"></script>
+    <script src="/app.js"></script>
   </body>
 </html>
 
