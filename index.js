@@ -4,6 +4,7 @@ const PROCESSES_PER_BATCH = 6;
 
 const KEY_EVENTS = {
   i: 'interruptRunning',
+  e: 'setErrorOnRunning',
   p: 'pauseSimulation',
   c: 'startSimulation',
 };
@@ -94,7 +95,7 @@ const app = new Vue({
         ? this.runningProcess.eTime + TICK_VALUE
         : TICK_VALUE;
       this.$set(this.runningProcess, 'eTime', eTime);
-      if (eTime >= this.runningProcess.time) {
+      if (this.shouldProcessBeCompleted(this.runningProcess)) {
         this.addToArray(this.runningProcess, this.completedProcesses);
         this.runningProcess = {};
       }
@@ -102,6 +103,12 @@ const app = new Vue({
     interruptRunning: function () {
       this.runningBatch.push(this.runningProcess);
       this.runningProcess = {};
+    },
+    setErrorOnRunning: function () {
+      this.runningProcess.hasError = true;
+    },
+    shouldProcessBeCompleted: function(process) {
+      return process.hasError || (process.eTime >= process.time);
     },
   },
   computed: {
