@@ -3,6 +3,7 @@ const TICK_VALUE = TICK_INTERVAL / 1000;
 const PROCESSES_PER_BATCH = 6;
 
 const KEY_EVENTS = {
+  i: 'interruptRunning',
   p: 'pauseSimulation',
   c: 'startSimulation',
 };
@@ -97,6 +98,10 @@ const app = new Vue({
         this.addToArray(this.runningProcess, this.completedProcesses);
         this.runningProcess = {};
       }
+    },
+    interruptRunning: function () {
+      this.runningBatch.push(this.runningProcess);
+      this.runningProcess = {};
     },
   },
   computed: {
