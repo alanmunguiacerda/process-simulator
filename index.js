@@ -2,6 +2,13 @@ const TICK_INTERVAL = 100;
 const TICK_VALUE = TICK_INTERVAL / 1000;
 const PROCESSES_PER_BATCH = 6;
 
+const KEY_EVENTS = {
+  p: 'pauseSimulation',
+  c: 'startSimulation',
+};
+
+const bus = new Vue();
+
 const app = new Vue({
   el: '#app',
   data: {
@@ -102,5 +109,12 @@ const app = new Vue({
     fixedTime: function() {
       return this.time.toFixed(1);
     }
+  },
+  mounted() {
+    Object.values(KEY_EVENTS).forEach(v => bus.$on(v, this[v]));
   }
-})
+});
+
+const keyListener = new window.keypress.Listener();
+
+Object.keys(KEY_EVENTS).forEach(k => keyListener.simple_combo(k, () => bus.$emit(KEY_EVENTS[k])));
