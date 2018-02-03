@@ -6,10 +6,6 @@ const runningProcessTemplate = `
       <td>{{ process.id }}</td>
     </tr>
     <tr>
-      <th>Name</th>
-      <td>{{ process.name }}</td>
-    </tr>
-    <tr>
       <th>Op</th>
       <td>{{ process.op }}</td>
     </tr>
