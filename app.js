@@ -41,7 +41,7 @@ const app = new Vue({
       }
     },
     updateReadyProcess: function(p) {
-      return { ...p, waitingTime: p.waitingTime + TICK_VALUE };
+      return { ...p, waitingT: p.waitingT + TICK_VALUE };
     },
     canAddToReady: function() {
       return this.newP.length && this.getProcessesInMemoryCount() < MAX_P_IN_MEMORY;
@@ -53,35 +53,35 @@ const app = new Vue({
       this.runningP = this.runningP.map(this.updateRunningProcess).filter(p => !!p);
       while (this.canAddToRunning()) {
         const p = this.readyP.shift();
-        p.entryTime = p.entryTime || this.time;
+        p.entryT = p.entryT || this.time;
         this.runningP.push(p);
       }
     },
     updateRunningProcess: function(p) {
       if (this.shouldProcessBeFinished(p)) {
-        this.finishedP.push({ ...p, finishTime: this.time });
+        this.finishedP.push({ ...p, finishT: this.time });
         return null;
       }
-      return { ...p, elapsedTime: p.elapsedTime + TICK_VALUE };
+      return { ...p, elapsedT: p.elapsedT + TICK_VALUE };
     },
     canAddToRunning: function() {
       return this.readyP.length && this.runningP.length < MAX_P_RUNNING;
     },
     shouldProcessBeFinished: function(p) {
-      return p.hasError || isEqOrGr(p.elapsedTime, p.maxTime);
+      return p.hasError || isEqOrGr(p.elapsedT, p.maxTime);
     },
     updateBloquedProcesses: function() {
       this.bloquedP = this.bloquedP.map(this.updateBloquedProcess).filter(p => !!p);
     },
     updateBloquedProcess: function(p) {
       if (this.shouldProcessBeReady(p)) {
-        this.readyP.push({ ...p, bloquedTime: 0 });
+        this.readyP.push({ ...p, bloquedT: 0 });
         return null;
       }
-      return { ...p, bloquedTime: p.bloquedTime + TICK_VALUE };
+      return { ...p, bloquedT: p.bloquedT + TICK_VALUE };
     },
     shouldProcessBeReady: function(p) {
-      return isEqOrGr(p.bloquedTime, BLOQUED_TIME);
+      return isEqOrGr(p.bloquedT, BLOQUED_TIME);
     },
     startSimulation: function() {
       this.isRunning = true;

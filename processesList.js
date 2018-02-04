@@ -4,15 +4,15 @@ const processesListTemplate = `
     <thead>
       <tr>
         <th v-if="shouldShow('id')">Id</th>
-        <th v-if="shouldShow('arrivalTime')">ArrivalT</th>
-        <th v-if="shouldShow('finishTime')">FinishT</th>
-        <th v-if="shouldShow('returnTime')">ReturnT</th>
-        <th v-if="shouldShow('entryTime')">ResponseT</th>
-        <th v-if="shouldShow('waitingTime')">WaitingT</th>
+        <th v-if="shouldShow('arrivalT')">ArrivalT</th>
+        <th v-if="shouldShow('finishT')">FinishT</th>
+        <th v-if="shouldShow('returnT')">ReturnT</th>
+        <th v-if="shouldShow('entryT')">ResponseT</th>
+        <th v-if="shouldShow('waitingT')">WaitingT</th>
         <th v-if="shouldShow('maxTime')">MaxT</th>
-        <th v-if="shouldShow('elapsedTime')">ElapsedT</th>
-        <th v-if="shouldShow('remainingTime')">RemainingT</th>
-        <th v-if="shouldShow('bloquedTime')">BloquedT</th>
+        <th v-if="shouldShow('elapsedT')">ElapsedT</th>
+        <th v-if="shouldShow('remainingT')">RemainingT</th>
+        <th v-if="shouldShow('bloquedT')">BloquedT</th>
         <th v-if="shouldShow('opA')">OpA</th>
         <th v-if="shouldShow('op')">Op</th>
         <th v-if="shouldShow('opB')">OpB</th>
@@ -23,15 +23,15 @@ const processesListTemplate = `
     <tbody>
       <tr v-for="p in processes">
         <td v-if="shouldShow('id')">{{ p.id }}</td>
-        <td v-if="shouldShow('arrivalTime')">{{ p.arrivalTime | toFixed }}</td>
-        <td v-if="shouldShow('finishTime')">{{ p.finishTime | toFixed }}</td>
-        <td v-if="shouldShow('returnTime')">{{ getReturnTime(p) | toFixed }}</td>
-        <td v-if="shouldShow('entryTime')">{{ getResponseTime(p) | toFixed }}</td>
-        <td v-if="shouldShow('waitingTime')">{{ p.waitingTime | toFixed }}</td>
+        <td v-if="shouldShow('arrivalT')">{{ p.arrivalT | toFixed }}</td>
+        <td v-if="shouldShow('finishT')">{{ p.finishT | toFixed }}</td>
+        <td v-if="shouldShow('returnT')">{{ getReturnTime(p) | toFixed }}</td>
+        <td v-if="shouldShow('entryT')">{{ getResponseTime(p) | toFixed }}</td>
+        <td v-if="shouldShow('waitingT')">{{ p.waitingT | toFixed }}</td>
         <td v-if="shouldShow('maxTime')">{{ p.maxTime | toFixed }}</td>
-        <td v-if="shouldShow('elapsedTime')">{{ p.elapsedTime | toFixed }}</td>
-        <td v-if="shouldShow('remainingTime')">{{ getRemainingTime(p) | toFixed }}</td>
-        <td v-if="shouldShow('bloquedTime')">{{ p.bloquedTime | toFixed }}</td>
+        <td v-if="shouldShow('elapsedT')">{{ p.elapsedT | toFixed }}</td>
+        <td v-if="shouldShow('remainingT')">{{ getRemainingTime(p) | toFixed }}</td>
+        <td v-if="shouldShow('bloquedT')">{{ p.bloquedT | toFixed }}</td>
         <td v-if="shouldShow('opA')">{{ p.opA }}</td>
         <td v-if="shouldShow('op')">{{ p.op }}</td>
         <td v-if="shouldShow('opB')">{{ p.opB }}</td>
@@ -58,14 +58,14 @@ Vue.component('processes-list', {
       return eval(`${opA} ${op} ${opB}`);
     },
     getRemainingTime: function(p) {
-      const remainingTime = (p.maxTime - p.elapsedTime);
-      return remainingTime < 0 ? 0 : remainingTime;
+      const remainingT = (p.maxTime - p.elapsedT);
+      return remainingT < 0 ? 0 : remainingT;
     },
     getReturnTime: function(p) {
-      return p.finishTime - p.arrivalTime;
+      return p.finishT - p.arrivalT;
     },
     getResponseTime: function(p) {
-      return p.entryTime - p.arrivalTime;
+      return p.entryT - p.arrivalT;
     },
     shouldShow: function(attr) {
       return this.columns.includes(attr);

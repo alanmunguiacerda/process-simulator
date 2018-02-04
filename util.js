@@ -24,12 +24,12 @@ const getNewProcess = () => ({
   op: getRandomOp(),
   opB: getRandomInt(1, 25),
   maxTime: getRandomInt(5,15),  // Max exec time
-  elapsedTime: 0,               // Time running
-  bloquedTime: 0,               // Time bloqued
-  arrivalTime: 0,               // Arrival time
-  finishTime: 0,                // Finish time
-  entryTime: 0,                 // First arrival to processor
-  waitingTime: 0,               // Waiting time
+  elapsedT: 0,               // Time running
+  bloquedT: 0,               // Time bloqued
+  arrivalT: 0,               // Arrival time
+  finishT: 0,                // Finish time
+  entryT: 0,                 // First arrival to processor
+  waitingT: 0,               // Waiting time
 });
 
 const isEqOrGr = (a, b) => Number(a.toFixed(FX)) >= Number(b.toFixed(FX));

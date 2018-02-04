@@ -43,21 +43,21 @@
           <h5>New processes <b>({{ newP.length }})</b></h5>
           <processes-list
             :processes="newP"
-            :columns="['id', 'maxTime', 'op']"
+            :columns="['id', 'arrivalT', 'maxTime', 'op']"
           ></processes-list>
         </div>
         <div class="column">
           <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
           <processes-list
             :processes="bloquedP"
-            :columns="['id', 'bloquedTime']"
+            :columns="['id', 'bloquedT']"
           ></processes-list>
         </div>
         <div class="column">
           <h5>Ready processes <b>({{ readyP.length }})</b></h5>
           <processes-list
             :processes="readyP"
-            :columns="['id', 'maxTime', 'remainingTime']"
+            :columns="['id', 'maxTime', 'remainingT']"
           ></processes-list>
         </div>
       </div>
@@ -66,7 +66,7 @@
           <h5>Running processes <b>({{ runningP.length }})</b></h5>
           <processes-list
             :processes="runningP"
-            :columns="['id', 'maxTime', 'elapsedTime', 'remainingTime', 'opA', 'op', 'opB']"
+            :columns="['id', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
           ></processes-list>
         </div>
       </div>
@@ -75,7 +75,7 @@
           <h5>Finished processes <b>({{ finishedP.length }})</b></h5>
           <processes-list
             :processes="finishedP"
-            :columns="['id', 'arrivalTime', 'finishTime', 'returnTime', 'entryTime', 'waitingTime', 'maxTime', 'elapsedTime', 'remainingTime', 'opA', 'op', 'opB', 'result']"
+            :columns="['id', 'arrivalT', 'finishT', 'returnT', 'entryT', 'waitingT', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB', 'result']"
           ></processes-list>
         </div>
       </div>
