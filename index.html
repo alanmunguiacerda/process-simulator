@@ -1,39 +1,21 @@
 <doctype HTML>
 <html>
   <head>
-    <title>ACT 4</title>
+    <title>ACT 6</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/styles/fonts.css">
     <link rel="stylesheet" href="/styles/normalize.css">
     <link rel="stylesheet" href="/styles/milligram.min.css">
+    <link rel="stylesheet" href="/styles/index.css">
   </head>
   <body class="container">
-    <style>
-      td {
-        padding: 0.1rem 1.5rem;
-      }
-      th {
-        padding: 0.1rem 1.5rem;
-      }
-    </style>
-    <h1>Batch processing (2)</h1>
-
+    <h1>FIFO processing</h1>
+    <div class="divisor"></div>
+  
     <div id="app">
       <div class="row">
         <div class="column">
-          <h5>Time elapsed: {{ fixedTime }}</h5>
-        </div>
-        <div class="column">
-          <h5>Pending batches: {{ pendingBatches }}</h5>
-        </div>
-        <div class="column" v-if="canUseInput">
-          <label style="color: red" v-if="error">{{ error }}</label>
-          <input type="number" min="1" v-model.number="initialNum"/>
-        </div>
-        <div class="column" v-if="canUseInput">
-          <button class="button" v-on:click="addInitialProcesses">
-            Add
-          </button>
+          <h3>Time elapsed: {{ fixedTime }}</h3>
         </div>
         <div class="column">
           <button class="button" v-on:click="toggleSimulation">
@@ -48,50 +30,51 @@
       </div>
       <div class="row">
         <div class="column">
-          <h3>Enqueued batches</h3>
-          <div v-for="(val, key) in batches">
-            <h6>Batch {{ key + 1 }}</h6>
-            <processes-list
-              :processes="val"
-              :columns="['id', 'time', 'op']"
-              v-on:delete-process="handleDeleteProcess"
-            ></processes-list>
-          </div>
+          <h5>New processes <b>({{ newP.length }})</b></h5>
+          <processes-list
+            :processes="newP"
+            :columns="['id', 'maxTime', 'op']"
+          ></processes-list>
         </div>
         <div class="column">
-          <h3>Running batch</h3>
+          <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
           <processes-list
-            v-if="runningBatch.length"
-            :processes="runningBatch"
-            :columns="['id', 'time', 'remTime']"
+            :processes="bloquedP"
+            :columns="['id', 'bloquedTime']"
+          ></processes-list>
+        </div>
+        <div class="column">
+          <h5>Ready processes <b>({{ readyP.length }})</b></h5>
+          <processes-list
+            :processes="readyP"
+            :columns="['id', 'maxTime', 'remainingTime']"
           ></processes-list>
         </div>
       </div>
       <div class="row">
         <div class="column">
-          <h3>Running process</h3>
-          <running-process
-            :process="runningProcess"
-          ></running-process>
+          <h5>Running processes <b>({{ runningP.length }})</b></h5>
+          <processes-list
+            :processes="runningP"
+            :columns="['id', 'maxTime', 'elapsedTime', 'remainingTime', 'opA', 'op', 'opB']"
+          ></processes-list>
         </div>
+      </div>
+      <div class="row">
         <div class="column">
-          <h3>Completed processes</h3>
-          <div v-for="(val, key) in completedProcesses">
-            <h6>Batch {{ key + 1 }}</h6>
-            <processes-list
-              :processes="val"
-              :columns="['id', 'time', 'remTime', 'opA', 'op', 'opB', 'result']"
-            ></processes-list>
-          </div>
+          <h5>Finished processes <b>({{ finishedP.length }})</b></h5>
+          <processes-list
+            :processes="finishedP"
+            :columns="['id', 'arrivalTime', 'finishTime', 'returnTime', 'entryTime', 'waitingTime', 'maxTime', 'elapsedTime', 'remainingTime', 'opA', 'op', 'opB', 'result']"
+          ></processes-list>
         </div>
       </div>
     </div>
 
     <script src="/vendor/vue.js"></script>
     <script src="/vendor/keypress.js"></script>
-    <script src="/newProcessForm.js"></script>
+    <script src="/util.js"></script>
     <script src="/processesList.js"></script>
-    <script src="/runningProcess.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>

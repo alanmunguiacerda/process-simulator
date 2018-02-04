@@ -1,7 +1,3 @@
-const TICK_INTERVAL = 100;
-const TICK_VALUE = TICK_INTERVAL / 1000;
-const PROCESSES_PER_BATCH = 6;
-
 const KEY_EVENTS = {
   i: 'interruptRunning',
   e: 'setErrorOnRunning',
@@ -9,18 +5,6 @@ const KEY_EVENTS = {
   c: 'startSimulation',
   n: 'addNewProcess',
 };
-
-const OPERATIONS = ['+', '-', '*', '/', '%'];
-const getRandomInt = (min, max) => {
-  if (max === undefined) {
-    max = min;
-    min = 0;
-  }
-  return Math.floor(Math.random() * Math.floor(max - min) + min);
-};
-const getRandomOp = () => {
-  return OPERATIONS[getRandomInt(5)];
-}
 
 const bus = new Vue();
 
@@ -30,70 +14,81 @@ const app = new Vue({
     nextId: 1,
     initialNum: 1,
     error: '',
-    batches: [], // Array of batches
-    runningBatch: [], // Array of processes
-    runningProcess: {}, // process
-    completedProcesses: [], // array of batches
+    newP: [],       // Unlimited
+    readyP: [],     // Limit to 6 the sum of this lengths
+    runningP: [],   // Limit to 6 the sum of this lengths
+    bloquedP: [],   // Limit to 6 the sum of this lengths
+    finishedP: [],  // Unlimited
     time: 0,
     isRunning: false,
     timerInterval: null,
   },
   methods: {
-    addToArray: function(data, array) {
-      if (!array.length) {
-        array.push([]);
-      }
-
-      const batch = array.find(b => b.length < PROCESSES_PER_BATCH);
-
-      if (batch) {
-        batch.push(data);
-        return;
-      }
-
-      array.push([data]);
-    },
-    handleAddProcess: function(process) {
-      if (this.time > 0) return;
-      this.addToArray(process, this.batches);
-    },
     addNewProcess: function() {
-      const newProcess = {
-        opA: getRandomInt(0, 25),
-        op: getRandomOp(),
-        opB: getRandomInt(1, 25),
-        time: getRandomInt(5, 15),
-        eTime: 0,
-        id: this.nextId,
-      };
+      const newProcess = getNewProcess();
+      newProcess.id = this.nextId;
+      newProcess.arrivalTime = this.time;
       this.nextId += 1;
-      this.addToArray(newProcess, this.batches);
+      this.newP.push(newProcess);
     },
-    handleDeleteProcess: function(processId) {
-      this.batches.forEach((b, i) => {
-        if (b.find(p => p.id === processId)) {
-          const filtered = b.filter(p => p.id !== processId);
-          if (filtered.length) {
-            this.batches.splice(i, 1, filtered);
-          } else {
-            this.batches.splice(i, 1);
-          }
-        }
-      });
+    updateReadyProcesses: function() {
+      this.readyP = this.readyP.map(this.updateReadyProcess);
+      while (this.canAddToReady()) {
+        this.readyP.push(this.newP.shift());
+      }
+    },
+    updateReadyProcess: function(p) {
+      return { ...p, waitingTime: p.waitingTime + TICK_VALUE };
+    },
+    canAddToReady: function() {
+      return this.newP.length && this.getProcessesInMemoryCount() < MAX_P_IN_MEMORY;
+    },
+    getProcessesInMemoryCount: function() {
+      return this.runningP.length + this.readyP.length + this.bloquedP.length;
+    },
+    updateRunningProcesses: function() {
+      this.runningP = this.runningP.map(this.updateRunningProcess).filter(p => !!p);
+      while (this.canAddToRunning()) {
+        const p = this.readyP.shift();
+        p.entryTime = p.entryTime || this.time;
+        this.runningP.push(p);
+      }
+    },
+    updateRunningProcess: function(p) {
+      if (this.shouldProcessBeFinished(p)) {
+        this.finishedP.push({ ...p, finishTime: this.time });
+        return null;
+      }
+      return { ...p, elapsedTime: p.elapsedTime + TICK_VALUE };
+    },
+    canAddToRunning: function() {
+      return this.readyP.length && this.runningP.length < MAX_P_RUNNING;
+    },
+    shouldProcessBeFinished: function(p) {
+      return p.hasError || isEqOrGr(p.elapsedTime, p.maxTime);
+    },
+    updateBloquedProcesses: function() {
+      this.bloquedP = this.bloquedP.map(this.updateBloquedProcess).filter(p => !!p);
+    },
+    updateBloquedProcess: function(p) {
+      if (this.shouldProcessBeReady(p)) {
+        this.readyP.push({ ...p, bloquedTime: 0 });
+        return null;
+      }
+      return { ...p, bloquedTime: p.bloquedTime + TICK_VALUE };
+    },
+    shouldProcessBeReady: function(p) {
+      return isEqOrGr(p.bloquedTime, BLOQUED_TIME);
     },
     startSimulation: function() {
       this.isRunning = true;
       if (!this.timerInterval) {
         this.timerInterval = setInterval(() => {
+          this.updateReadyProcesses();
+          this.updateRunningProcesses();
+          this.updateBloquedProcesses();
           this.tickTime();
-          if (!this.runningBatch.length) this.setRunningBatch();
-          if (!this.runningProcess.id) this.setRunningProcess();
-          if (this.runningProcess.id) this.updateRunningProcess();
-          if (
-            !this.batches.length &&
-            !this.runningBatch.length &&
-            !this.runningProcess.id
-          ) this.pauseSimulation();
+          if (!this.getProcessesInMemoryCount()) this.pauseSimulation();
         }, TICK_INTERVAL);
       }
     },
@@ -132,51 +127,20 @@ const app = new Vue({
     tickTime: function() {
       this.time += TICK_VALUE;
     },
-    setRunningBatch: function() {
-      if (!this.batches.length || this.runningProcess.id) return;
-      this.runningBatch = this.batches.shift();
-    },
-    setRunningProcess: function() {
-      if (!this.runningBatch.length) return;
-      this.runningProcess = this.runningBatch.shift();
-    },
-    updateRunningProcess: function() {
-      const eTime = this.runningProcess.eTime + TICK_VALUE;
-      this.$set(this.runningProcess, 'eTime', eTime);
-      if (this.shouldProcessBeCompleted(this.runningProcess)) {
-        this.addToArray(this.runningProcess, this.completedProcesses);
-        this.runningProcess = {};
-      }
-    },
     interruptRunning: function () {
-      if (!this.runningProcess.id) return;
-      this.runningBatch.push(this.runningProcess);
-      this.runningProcess = {};
+      this.bloquedP.push(...this.runningP);
+      this.runningP = [];
     },
     setErrorOnRunning: function () {
-      this.runningProcess.hasError = true;
-    },
-    shouldProcessBeCompleted: function(process) {
-      return process.hasError || (process.eTime >= process.time);
+      this.runningP = this.runningP.map(p => ({ ...p, hasError: true }));
     },
   },
   computed: {
-    pendingBatches: function() {
-      return this.batches.length;
-    },
     toggleText: function() {
       return this.time ? this.isRunning ? 'Pause' : 'Continue' : 'Start';
     },
     fixedTime: function() {
-      return this.time.toFixed(1);
-    },
-    canUseInput: function() {
-      return !this.time || (
-        !this.batches.length &&
-        !this.runningBatch.length &&
-        !this.runningProcess.id &&
-        !this.completedProcesses.length
-      )
+      return this.time.toFixed(FX);
     }
   },
   mounted() {
