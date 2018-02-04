@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/styles/index.css">
   </head>
   <body class="container">
-    <h1>FIFO processing</h1>
+    <h1>FIFO processing (2)</h1>
     <div class="divisor"></div>
 
     <div id="app">
@@ -82,11 +82,49 @@
       
       <modal v-if="showModal">
         <h3 slot="header">Process list</h3>
-        <processes-list
-          slot="body"
-          :processes="finishedP"
-          :columns="['id', 'arrivalTime', 'finishTime', 'returnTime', 'entryTime', 'waitingTime', 'maxTime', 'elapsedTime', 'remainingTime', 'opA', 'op', 'opB', 'result']"
-        ></processes-list>
+        <div slot="body">
+          <div class="row">
+            <div class="column">
+              <h5>New processes <b>({{ newP.length }})</b></h5>
+              <processes-list
+                :processes="newP"
+                :columns="['id', 'arrivalT', 'maxTime', 'op']"
+              ></processes-list>
+            </div>
+            <div class="column">
+              <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
+              <processes-list
+                :processes="bloquedP"
+                :columns="['id', 'bloquedT']"
+              ></processes-list>
+            </div>
+            <div class="column">
+              <h5>Ready processes <b>({{ readyP.length }})</b></h5>
+              <processes-list
+                :processes="readyP"
+                :columns="['id', 'maxTime', 'remainingT']"
+              ></processes-list>
+            </div>
+          </div>
+          <div class="row">
+            <div class="column">
+              <h5>Running processes <b>({{ runningP.length }})</b></h5>
+              <processes-list
+                :processes="runningP"
+                :columns="['id', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
+              ></processes-list>
+            </div>
+          </div>
+          <div class="row">
+            <div class="column">
+              <h5>Finished processes <b>({{ finishedP.length }})</b></h5>
+              <processes-list
+                :processes="finishedP"
+                :columns="['id', 'arrivalT', 'finishT', 'returnT', 'entryT', 'waitingT', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB', 'result']"
+              ></processes-list>
+            </div>
+          </div>
+        </div>
       </modal>
     </div>
 
