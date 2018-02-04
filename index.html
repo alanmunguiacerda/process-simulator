@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/styles/fonts.css">
     <link rel="stylesheet" href="/styles/normalize.css">
     <link rel="stylesheet" href="/styles/milligram.min.css">
+    <link rel="stylesheet" href="/styles/modal.css">
     <link rel="stylesheet" href="/styles/index.css">
   </head>
   <body class="container">
@@ -78,10 +79,20 @@
           ></processes-list>
         </div>
       </div>
+      
+      <modal v-if="showModal">
+        <h3 slot="header">Process list</h3>
+        <processes-list
+          slot="body"
+          :processes="finishedP"
+          :columns="['id', 'arrivalTime', 'finishTime', 'returnTime', 'entryTime', 'waitingTime', 'maxTime', 'elapsedTime', 'remainingTime', 'opA', 'op', 'opB', 'result']"
+        ></processes-list>
+      </modal>
     </div>
 
     <script src="/vendor/vue.js"></script>
     <script src="/vendor/keypress.js"></script>
+    <script src="/vendor/modal.js"></script>
     <script src="/util.js"></script>
     <script src="/processesList.js"></script>
     <script src="/app.js"></script>

@@ -4,6 +4,7 @@ const KEY_EVENTS = {
   p: 'pauseSimulation',
   c: 'startSimulation',
   n: 'addNewProcess',
+  t: 'showProcessTable',
 };
 
 const bus = new Vue();
@@ -11,6 +12,7 @@ const bus = new Vue();
 const app = new Vue({
   el: '#app',
   data: {
+    showModal: false,
     nextId: 1,
     initialNum: 1,
     error: '',
@@ -83,6 +85,7 @@ const app = new Vue({
     },
     startSimulation: function() {
       this.isRunning = true;
+      this.showModal = false;
       if (!this.timerInterval) {
         this.timerInterval = setInterval(() => {
           this.updateReadyProcesses();
@@ -129,13 +132,17 @@ const app = new Vue({
     tickTime: function() {
       this.time += TICK_VALUE;
     },
-    interruptRunning: function () {
+    interruptRunning: function() {
       this.bloquedP.push(...this.runningP);
       this.runningP = [];
     },
-    setErrorOnRunning: function () {
+    setErrorOnRunning: function() {
       this.runningP = this.runningP.map(p => ({ ...p, hasError: true }));
     },
+    showProcessTable: function() {
+      this.pauseSimulation();
+      this.showModal = true;
+    }
   },
   computed: {
     toggleText: function() {
