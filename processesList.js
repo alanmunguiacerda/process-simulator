@@ -73,6 +73,7 @@ Vue.component('processes-list', {
   },
   filters: {
     toFixed: function(v, n=FX) {
+      if (isNaN(v)) return v;
       return Number(v).toFixed(n);
     },
   }
