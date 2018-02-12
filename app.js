@@ -36,7 +36,7 @@ const app = new Vue({
       this.readyP = this.readyP.map(this.updateReadyProcess);
       while (this.canAddToReady()) {
         const nextProcess = this.newP.shift();
-        nextProcess.arrivalTime = this.time;
+        nextProcess.arrivalT = this.time;
         this.readyP.push(nextProcess);
       }
     },
