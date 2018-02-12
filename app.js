@@ -27,14 +27,15 @@ const app = new Vue({
     addNewProcess: function() {
       const newProcess = getNewProcess();
       newProcess.id = this.nextId;
-      newProcess.arrivalTime = this.time;
       this.nextId += 1;
       this.newP.push(newProcess);
     },
     updateReadyProcesses: function() {
       this.readyP = this.readyP.map(this.updateReadyProcess);
       while (this.canAddToReady()) {
-        this.readyP.push(this.newP.shift());
+        const nextProcess = this.newP.shift();
+        nextProcess.arrivalTime = this.time;
+        this.readyP.push(nextProcess);
       }
     },
     updateReadyProcess: function(p) {
