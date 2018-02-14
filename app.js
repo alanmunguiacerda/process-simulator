@@ -16,7 +16,7 @@ const getRandomInt = (min, max) => {
     max = min;
     min = 0;
   }
-  return Math.floor(Math.random() * Math.floor(max) + min);
+  return Math.floor(Math.random() * Math.floor(max - min) + min);
 };
 const getRandomOp = () => {
   return OPERATIONS[getRandomInt(5)];
