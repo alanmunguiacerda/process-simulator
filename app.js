@@ -116,10 +116,11 @@ const app = new Vue({
     },
     restartSimulation: function() {
       this.nextId = 1;
-      this.batches = [];
-      this.runningBatch = [];
-      this.runningProcess = {};
-      this.completedProcesses = [];
+      this.newP = [];
+      this.readyP = [];
+      this.runningP = [];
+      this.bloquedP = [];
+      this.finishedP = [];
       this.time = 0;
       this.initialNum = 1;
       this.error = '';
@@ -142,6 +143,14 @@ const app = new Vue({
     },
     fixedTime: function() {
       return this.time.toFixed(FX);
+    },
+    canUseInput: function() {
+      return !this.time || (
+        !this.readyP.length &&
+        !this.runningP.length &&
+        !this.bloquedP.length &&
+        !this.finishedP.length
+      );
     }
   },
   mounted() {

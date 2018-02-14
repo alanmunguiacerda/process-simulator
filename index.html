@@ -11,11 +11,20 @@
   <body class="container">
     <h1>FIFO processing</h1>
     <div class="divisor"></div>
-  
+
     <div id="app">
       <div class="row">
         <div class="column">
           <h3>Time elapsed: {{ fixedTime }}</h3>
+        </div>
+        <div class="column" v-if="canUseInput">
+          <label style="color: red" v-if="error">{{ error }}</label>
+          <input type="number" min="1" v-model.number="initialNum"/>
+        </div>
+        <div class="column" v-if="canUseInput">
+          <button class="button" v-on:click="addInitialProcesses">
+            Add
+          </button>
         </div>
         <div class="column">
           <button class="button" v-on:click="toggleSimulation">
