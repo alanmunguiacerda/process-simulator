@@ -1,7 +1,7 @@
 <doctype HTML>
 <html>
   <head>
-    <title>ACT 2</title>
+    <title>ACT 4</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/styles/fonts.css">
     <link rel="stylesheet" href="/styles/normalize.css">
@@ -16,8 +16,8 @@
         padding: 0.1rem 1.5rem;
       }
     </style>
-    <h1>Batch processing</h1>
-    
+    <h1>Batch processing (2)</h1>
+
     <div id="app">
       <div class="row">
         <div class="column">
@@ -26,9 +26,23 @@
         <div class="column">
           <h5>Pending batches: {{ pendingBatches }}</h5>
         </div>
+        <div class="column" v-if="canUseInput">
+          <label style="color: red" v-if="error">{{ error }}</label>
+          <input type="number" min="1" v-model.number="initialNum"/>
+        </div>
+        <div class="column" v-if="canUseInput">
+          <button class="button" v-on:click="addInitialProcesses">
+            Add
+          </button>
+        </div>
         <div class="column">
           <button class="button" v-on:click="toggleSimulation">
             {{ toggleText }}
+          </button>
+        </div>
+        <div class="column">
+          <button class="button" v-on:click="restartSimulation">
+            Reset
           </button>
         </div>
       </div>
@@ -81,22 +95,3 @@
     <script src="/app.js"></script>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

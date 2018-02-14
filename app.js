@@ -28,6 +28,8 @@ const app = new Vue({
   el: '#app',
   data: {
     nextId: 1,
+    initialNum: 1,
+    error: '',
     batches: [], // Array of batches
     runningBatch: [], // Array of processes
     runningProcess: {}, // process
@@ -43,7 +45,7 @@ const app = new Vue({
       }
 
       const batch = array.find(b => b.length < PROCESSES_PER_BATCH);
-      
+
       if (batch) {
         batch.push(data);
         return;
@@ -60,7 +62,7 @@ const app = new Vue({
         opA: getRandomInt(0, 25),
         op: getRandomOp(),
         opB: getRandomInt(1, 25),
-        time: getRandomInt(1, 7),
+        time: getRandomInt(5, 15),
         eTime: 0,
         id: this.nextId,
       };
@@ -87,7 +89,11 @@ const app = new Vue({
           if (!this.runningBatch.length) this.setRunningBatch();
           if (!this.runningProcess.id) this.setRunningProcess();
           if (this.runningProcess.id) this.updateRunningProcess();
-          if (!this.runningBatch.length && !this.runningProcess.id) this.pauseSimulation();
+          if (
+            !this.batches.length &&
+            !this.runningBatch.length &&
+            !this.runningProcess.id
+          ) this.pauseSimulation();
         }, TICK_INTERVAL);
       }
     },
@@ -105,11 +111,27 @@ const app = new Vue({
       }
       this.startSimulation();
     },
+    addInitialProcesses: function() {
+      if (this.initialNum < 1) {
+        this.error = 'Invalid number';
+        return;
+      }
+      for (let i = 0; i < this.initialNum; i++) this.addNewProcess();
+    },
+    restartSimulation: function() {
+      this.nextId = 1;
+      this.batches = [];
+      this.runningBatch = [];
+      this.runningProcess = {};
+      this.completedProcesses = [];
+      this.time = 0;
+      this.pauseSimulation();
+    },
     tickTime: function() {
       this.time += TICK_VALUE;
     },
     setRunningBatch: function() {
-      if (!this.batches.length) return;
+      if (!this.batches.length || this.runningProcess.id) return;
       this.runningBatch = this.batches.shift();
     },
     setRunningProcess: function() {
@@ -125,6 +147,7 @@ const app = new Vue({
       }
     },
     interruptRunning: function () {
+      if (!this.runningProcess.id) return;
       this.runningBatch.push(this.runningProcess);
       this.runningProcess = {};
     },
@@ -140,10 +163,18 @@ const app = new Vue({
       return this.batches.length;
     },
     toggleText: function() {
-      return this.isRunning ? 'Pause' : 'Start';
+      return this.time ? this.isRunning ? 'Pause' : 'Continue' : 'Start';
     },
     fixedTime: function() {
       return this.time.toFixed(1);
+    },
+    canUseInput: function() {
+      return !this.time || (
+        !this.batches.length &&
+        !this.runningBatch.length &&
+        !this.runningProcess.id &&
+        !this.completedProcesses.length
+      )
     }
   },
   mounted() {
