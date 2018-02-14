@@ -125,6 +125,8 @@ const app = new Vue({
       this.runningProcess = {};
       this.completedProcesses = [];
       this.time = 0;
+      this.initialNum = 1;
+      this.error = '';
       this.pauseSimulation();
     },
     tickTime: function() {
