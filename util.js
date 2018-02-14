@@ -12,7 +12,7 @@ const getRandomInt = (min, max) => {
     max = min;
     min = 0;
   }
-  return Math.floor(Math.random() * Math.floor(max) + min);
+  return Math.floor(Math.random() * Math.floor(max - min) + min);
 };
 
 const getRandomOp = () => {
@@ -23,7 +23,7 @@ const getNewProcess = () => ({
   opA: getRandomInt(0, 25),
   op: getRandomOp(),
   opB: getRandomInt(1, 25),
-  maxTime: getRandomInt(1, 7),  // Max exec time
+  maxTime: getRandomInt(5,15),  // Max exec time
   elapsedTime: 0,               // Time running
   bloquedTime: 0,               // Time bloqued
   arrivalTime: 0,               // Arrival time
