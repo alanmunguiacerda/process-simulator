@@ -11,3 +11,17 @@ th {
 h5 {
   color: #42b983;
 }
+.progressbar {
+  color: #606c76;
+  border: 1px solid #e1e1e1;
+  text-align: center;
+  height: 100%;
+}
+.progressbar > div:before {
+  content: attr(data-label);
+  margin: 0 2px;
+}
+.progressbar > div {
+  background-color: #9b4dca;
+  height: 100%;
+}

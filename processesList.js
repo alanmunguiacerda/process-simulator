@@ -11,13 +11,14 @@ const processesListTemplate = `
         <th v-if="shouldShow('waitingT')">WaitingT</th>
         <th v-if="shouldShow('maxTime')">MaxT</th>
         <th v-if="shouldShow('elapsedT')">ElapsedT</th>
-        <th v-if="shouldShow('remainingT')">RemainingT</th>
+        <th v-if="shouldShow('remainingT')">RmngT</th>
         <th v-if="shouldShow('bloquedT')">BloquedT</th>
         <th v-if="shouldShow('opA')">OpA</th>
         <th v-if="shouldShow('op')">Op</th>
         <th v-if="shouldShow('opB')">OpB</th>
         <th v-if="shouldShow('delete')">Delete</th>
         <th v-if="shouldShow('result')">Result</th>
+        <th v-if="shouldShow('progress')">Progress</th>
       </tr>
     </thead>
     <tbody>
@@ -39,6 +40,26 @@ const processesListTemplate = `
           <a href="#" v-on:click="deleteProcess(p.id)">x</a>
         </td>
         <td v-if="shouldShow('result')">{{ getResult(p) | toFixed(3) }}</td>
+        <td v-if="shouldShow('progress')">
+          <div class="progressbar">
+            <div 
+              :style="{ width: (p.elapsedT / p.maxTime * 100) + '%' }" 
+              :data-label="getProgressTxt(p)"
+            >
+            </div>
+          </div>
+          <div class="progressbar">
+            <div 
+              :style="{
+                  width: (p.quantumT / quantum * 100) + '%', 
+                  'background-color': '#42b983',
+                  'font-size': '10px',
+              }"
+              :data-label="(getQuantumProgress(p))"
+            >
+            </div>
+          </div>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -47,7 +68,7 @@ const processesListTemplate = `
 
 Vue.component('processes-list', {
   template: processesListTemplate,
-  props: ['processes', 'columns'],
+  props: ['processes', 'columns', 'quantum'],
   methods: {
     deleteProcess: function(processId) {
       this.$emit('delete-process', processId);
@@ -69,6 +90,12 @@ Vue.component('processes-list', {
     },
     getWaitingTime: function(p) {
       return p.finishT - p.arrivalT - p.elapsedT;
+    },
+    getProgressTxt: function (p) {
+      return `${p.elapsedT.toFixed(FX)}/${p.maxTime}`;
+    },
+    getQuantumProgress: function (p) {
+      return `${p.quantumT.toFixed(FX)}/${this.quantum}`;
     },
     shouldShow: function(attr) {
       return this.columns.includes(attr);

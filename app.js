@@ -15,7 +15,8 @@ const app = new Vue({
     showModal: false,
     nextId: 1,
     initialNum: 1,
-    error: '',
+    numberError: '',
+    quantumError: '',
     newP: [],       // Unlimited
     readyP: [],     // Limit to 6 the sum of this lengths
     runningP: [],   // Limit to 6 the sum of this lengths
@@ -24,6 +25,7 @@ const app = new Vue({
     time: 0,
     isRunning: false,
     timerInterval: null,
+    quantum: 1,
   },
   methods: {
     addNewProcess: function() {
@@ -62,13 +64,24 @@ const app = new Vue({
         this.finishedP.push({ ...p, finishT: this.time - 0.1 });
         return null;
       }
-      return { ...p, elapsedT: p.elapsedT + TICK_VALUE };
+      if (this.hasFinishedQuantumT(p)) {
+        this.readyP.push({ ...p, quantumT: 0 });
+        return null;
+      }
+      return { 
+        ...p, 
+        elapsedT: p.elapsedT + TICK_VALUE, 
+        quantumT: p.quantumT + TICK_VALUE,
+      };
     },
     canAddToRunning: function() {
       return this.readyP.length && this.runningP.length < MAX_P_RUNNING;
     },
     shouldProcessBeFinished: function(p) {
       return p.hasError || isEqOrGr(p.elapsedT, p.maxTime);
+    },
+    hasFinishedQuantumT: function(p) {
+      return isEqOrGr(p.quantumT, this.quantum);
     },
     updateBloquedProcesses: function() {
       this.bloquedP = this.bloquedP.map(this.updateBloquedProcess).filter(p => !!p);
@@ -104,17 +117,23 @@ const app = new Vue({
       }
     },
     toggleSimulation: function() {
+      if (this.quantum < 1) {
+        this.quantumError = 'Invalid quantum';
+        return;
+      }
       if (this.isRunning) {
         this.pauseSimulation();
         return;
       }
+      this.quantumError = '';
       this.startSimulation();
     },
     addInitialProcesses: function() {
       if (this.initialNum < 1) {
-        this.error = 'Invalid number';
+        this.numberError = 'Invalid number';
         return;
       }
+      this.numberError = '';
       for (let i = 0; i < this.initialNum; i++) this.addNewProcess();
     },
     restartSimulation: function() {
@@ -126,14 +145,16 @@ const app = new Vue({
       this.finishedP = [];
       this.time = 0;
       this.initialNum = 1;
-      this.error = '';
+      this.quantum = 1;
+      this.numberError = '';
+      this.quantumError = '';
       this.pauseSimulation();
     },
     tickTime: function() {
       this.time += TICK_VALUE;
     },
     interruptRunning: function() {
-      this.bloquedP.push(...this.runningP);
+      this.bloquedP.push(...this.runningP.map(p => ({ ...p, quantumT: 0 })));
       this.runningP = [];
     },
     setErrorOnRunning: function() {

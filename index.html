@@ -1,7 +1,7 @@
 <doctype HTML>
 <html>
   <head>
-    <title>ACT 8</title>
+    <title>ACT 10</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/styles/fonts.css">
     <link rel="stylesheet" href="/styles/normalize.css">
@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/styles/index.css">
   </head>
   <body class="container">
-    <h1>FIFO processing (2)</h1>
+    <h1>RR processing</h1>
     <div class="divisor"></div>
 
     <div id="app">
@@ -19,7 +19,8 @@
           <h3>Time elapsed: {{ fixedTime }}</h3>
         </div>
         <div class="column" v-if="canUseInput">
-          <label style="color: red" v-if="error">{{ error }}</label>
+          <label v-if="!numberError">Add processes</label>
+          <label style="color: red" v-if="numberError">{{ numberError }}</label>
           <input type="number" min="1" v-model.number="initialNum"/>
         </div>
         <div class="column" v-if="canUseInput">
@@ -27,12 +28,20 @@
             Add
           </button>
         </div>
+        <div class="column" v-if="canUseInput">
+          <label v-if="!quantumError">Quantum</label>
+          <label style="color: red" v-if="quantumError">{{ quantumError }}</label>
+          <input type="number" min="1" v-model.number="quantum" placeholder="quantum"/>
+        </div>
+        <div class="column" v-if="!canUseInput">
+          <h3>Quantum: {{ quantum }}</h3>
+        </div>
         <div class="column">
           <button class="button" v-on:click="toggleSimulation">
             {{ toggleText }}
           </button>
         </div>
-        <div class="column">
+        <div class="column" v-if="!canUseInput">
           <button class="button" v-on:click="restartSimulation">
             Reset
           </button>
@@ -44,6 +53,7 @@
           <processes-list
             :processes="newP"
             :columns="['id', 'maxTime', 'op']"
+            :quantum="quantum"
           ></processes-list>
         </div>
         <div class="column">
@@ -51,13 +61,15 @@
           <processes-list
             :processes="bloquedP"
             :columns="['id', 'bloquedT']"
+            :quantum="quantum"
           ></processes-list>
         </div>
         <div class="column">
           <h5>Ready processes <b>({{ readyP.length }})</b></h5>
           <processes-list
             :processes="readyP"
-            :columns="['id', 'maxTime', 'remainingT']"
+            :columns="['id', 'remainingT', 'progress']"
+            :quantum="quantum"
           ></processes-list>
         </div>
       </div>
@@ -66,7 +78,8 @@
           <h5>Running processes <b>({{ runningP.length }})</b></h5>
           <processes-list
             :processes="runningP"
-            :columns="['id', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
+            :columns="['id', 'remainingT', 'opA', 'op', 'opB', 'progress']"
+            :quantum="quantum"
           ></processes-list>
         </div>
       </div>
@@ -75,7 +88,9 @@
           <h5>Finished processes <b>({{ finishedP.length }})</b></h5>
           <processes-list
             :processes="finishedP"
-            :columns="['id', 'arrivalT', 'finishT', 'returnT', 'entryT', 'waitingT', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB', 'result']"
+            :columns="['id', 'arrivalT', 'finishT', 'returnT', 'entryT', 'waitingT', 'maxTime',
+            'elapsedT', 'remainingT', 'opA', 'op', 'opB', 'result']"
+            :quantum="quantum"
           ></processes-list>
         </div>
       </div>
@@ -89,6 +104,7 @@
               <processes-list
                 :processes="newP"
                 :columns="['id', 'maxTime', 'op']"
+                :quantum="quantum"
               ></processes-list>
             </div>
             <div class="column">
@@ -96,6 +112,7 @@
               <processes-list
                 :processes="bloquedP"
                 :columns="['id', 'bloquedT']"
+                :quantum="quantum"
               ></processes-list>
             </div>
             <div class="column">
@@ -103,6 +120,7 @@
               <processes-list
                 :processes="readyP"
                 :columns="['id', 'maxTime', 'remainingT']"
+                :quantum="quantum"
               ></processes-list>
             </div>
           </div>
@@ -112,6 +130,7 @@
               <processes-list
                 :processes="runningP"
                 :columns="['id', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
+                :quantum="quantum"
               ></processes-list>
             </div>
           </div>
@@ -120,7 +139,9 @@
               <h5>Finished processes <b>({{ finishedP.length }})</b></h5>
               <processes-list
                 :processes="finishedP"
-                :columns="['id', 'arrivalT', 'finishT', 'returnT', 'entryT', 'waitingT', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB', 'result']"
+                :columns="['id', 'arrivalT', 'finishT', 'returnT', 'entryT', 'waitingT', 'maxTime',
+                'elapsedT', 'remainingT', 'opA', 'op', 'opB', 'result']"
+                :quantum="quantum"
               ></processes-list>
             </div>
           </div>

@@ -30,6 +30,7 @@ const getNewProcess = () => ({
   finishT: 0,                // Finish time
   entryT: -1,                 // First arrival to processor
   waitingT: 0,               // Waiting time
+  quantumT: 0,               // Quantum time
 });
 
 const isEqOrGr = (a, b) => Number(a.toFixed(FX)) >= Number(b.toFixed(FX));
