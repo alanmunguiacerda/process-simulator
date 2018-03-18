@@ -1,7 +1,7 @@
 <doctype HTML>
 <html>
   <head>
-    <title>ACT 10</title>
+    <title>ACT 14</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/styles/fonts.css">
     <link rel="stylesheet" href="/styles/normalize.css">
@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/styles/index.css">
   </head>
   <body class="container">
-    <h1>RR processing</h1>
+    <h1>Simple pagination</h1>
     <div class="divisor"></div>
 
     <div id="app">
@@ -52,18 +52,27 @@
           <h5>New processes <b>({{ newP.length }})</b></h5>
           <processes-list
             :processes="newP"
-            :columns="['id', 'maxTime', 'op']"
+            :columns="['id', 'size', 'maxTime', 'op']"
             :quantum="quantum"
           ></processes-list>
+        </div>
+        <div class="column column-50">
+          <h5>Memory <b>({{ processesInMemory.length }})</b></h5>
+          <memory
+            :memory="memory"
+            :processes="processesInMemory"
+          ></memory>
         </div>
         <div class="column">
           <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
           <processes-list
             :processes="bloquedP"
-            :columns="['id', 'bloquedT']"
+            :columns="['id', 'size', 'bloquedT']"
             :quantum="quantum"
           ></processes-list>
         </div>
+      </div>
+      <div class="row">
         <div class="column">
           <h5>Ready processes <b>({{ readyP.length }})</b></h5>
           <processes-list
@@ -72,8 +81,6 @@
             :quantum="quantum"
           ></processes-list>
         </div>
-      </div>
-      <div class="row">
         <div class="column">
           <h5>Running processes <b>({{ runningP.length }})</b></h5>
           <processes-list
@@ -95,7 +102,7 @@
         </div>
       </div>
       
-      <modal v-if="showModal">
+      <modal v-if="showProcessModal">
         <h3 slot="header">Process list</h3>
         <div slot="body">
           <div class="row">
@@ -147,6 +154,20 @@
           </div>
         </div>
       </modal>
+      
+      <modal v-if="showMemoryModal">
+        <h3 slot="header">Memory <b>({{ processesInMemory.length }})</b></h3>
+        <div slot="body">
+          <div class="row">
+            <div class="column">
+              <memory
+                :memory="memory"
+                :processes="processesInMemory"
+              ></memory>
+            </div>
+          </div>
+        </div>
+      </modal>
     </div>
 
     <script src="/vendor/vue.js"></script>
@@ -154,6 +175,7 @@
     <script src="/vendor/modal.js"></script>
     <script src="/util.js"></script>
     <script src="/processesList.js"></script>
+    <script src="/memory.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>

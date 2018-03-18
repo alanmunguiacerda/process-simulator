@@ -4,6 +4,7 @@ const processesListTemplate = `
     <thead>
       <tr>
         <th v-if="shouldShow('id')">Id</th>
+        <th v-if="shouldShow('size')">Size</th>
         <th v-if="shouldShow('arrivalT')">ArrivalT</th>
         <th v-if="shouldShow('finishT')">FinishT</th>
         <th v-if="shouldShow('returnT')">ReturnT</th>
@@ -19,11 +20,13 @@ const processesListTemplate = `
         <th v-if="shouldShow('delete')">Delete</th>
         <th v-if="shouldShow('result')">Result</th>
         <th v-if="shouldShow('progress')">Progress</th>
+        <th v-if="shouldShow('progress')">Quantum</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="p in processes">
         <td v-if="shouldShow('id')">{{ p.id }}</td>
+        <td v-if="shouldShow('size')">{{ p.size }}</td>
         <td v-if="shouldShow('arrivalT')">{{ p.arrivalT | toFixed }}</td>
         <td v-if="shouldShow('finishT')">{{ p.finishT | toFixed }}</td>
         <td v-if="shouldShow('returnT')">{{ getReturnTime(p) | toFixed }}</td>
@@ -43,22 +46,27 @@ const processesListTemplate = `
         <td v-if="shouldShow('progress')">
           <div class="progressbar">
             <div 
-              :style="{ width: (p.elapsedT / p.maxTime * 100) + '%' }" 
+              :style="{ 
+                width: (p.elapsedT / p.maxTime * 100) + '%',
+                'font-size': '14px',
+              }" 
               :data-label="getProgressTxt(p)"
             >
             </div>
           </div>
-          <div class="progressbar">
-            <div 
-              :style="{
-                  width: (p.quantumT / quantum * 100) + '%', 
-                  'background-color': '#42b983',
-                  'font-size': '10px',
-              }"
-              :data-label="(getQuantumProgress(p))"
-            >
-            </div>
+        </td>
+        <td v-if="shouldShow('progress')">
+        <div class="progressbar">
+          <div 
+            :style="{
+              width: (p.quantumT / quantum * 100) + '%', 
+              'background-color': '#42b983',
+              'font-size': '14px',
+            }"
+            :data-label="(getQuantumProgress(p))"
+          >
           </div>
+        </div>
         </td>
       </tr>
     </tbody>
@@ -107,4 +115,4 @@ Vue.component('processes-list', {
       return Number(v).toFixed(n);
     },
   }
-})
+});

@@ -5,6 +5,7 @@ const KEY_EVENTS = {
   c: 'startSimulation',
   n: 'addNewProcess',
   t: 'showProcessTable',
+  m: 'showMemoryTable',
 };
 
 const bus = new Vue();
@@ -12,7 +13,8 @@ const bus = new Vue();
 const app = new Vue({
   el: '#app',
   data: {
-    showModal: false,
+    showProcessModal: false,
+    showMemoryModal: false,
     nextId: 1,
     initialNum: 1,
     numberError: '',
@@ -26,6 +28,7 @@ const app = new Vue({
     isRunning: false,
     timerInterval: null,
     quantum: 1,
+    memory: [],
   },
   methods: {
     addNewProcess: function() {
@@ -40,13 +43,14 @@ const app = new Vue({
         const nextProcess = this.newP.shift();
         (nextProcess.arrivalT !== -1) || (nextProcess.arrivalT = this.time);
         this.readyP.push(nextProcess);
+        this.addProcessToMemory(nextProcess);
       }
     },
     updateReadyProcess: function(p) {
       return { ...p, waitingT: p.waitingT + TICK_VALUE };
     },
     canAddToReady: function() {
-      return this.newP.length && this.getProcessesInMemoryCount() < MAX_P_IN_MEMORY;
+      return this.newP.length && this.procFitsInMemory(this.newP[0]);
     },
     getProcessesInMemoryCount: function() {
       return this.runningP.length + this.readyP.length + this.bloquedP.length;
@@ -62,6 +66,7 @@ const app = new Vue({
     updateRunningProcess: function(p) {
       if (this.shouldProcessBeFinished(p)) {
         this.finishedP.push({ ...p, finishT: this.time - 0.1 });
+        this.freeMemory(p);
         return null;
       }
       if (this.hasFinishedQuantumT(p)) {
@@ -98,7 +103,8 @@ const app = new Vue({
     },
     startSimulation: function() {
       this.isRunning = true;
-      this.showModal = false;
+      this.showProcessModal = false;
+      this.showMemoryModal = false;
       if (!this.timerInterval) {
         this.timerInterval = setInterval(() => {
           this.updateReadyProcesses();
@@ -162,7 +168,42 @@ const app = new Vue({
     },
     showProcessTable: function() {
       this.pauseSimulation();
-      this.showModal = true;
+      this.showProcessModal = true;
+    },
+    showMemoryTable: function() {
+      this.pauseSimulation();
+      this.showMemoryModal = true;
+    },
+
+    // Memory stuff
+    getFreeFrames: function() {
+      return this.memory.filter(f => !f.processId);
+    },
+    procFitsInMemory: function(process) {
+      return this.getFreeFrames().length >= Math.ceil(process.size / FRAME_SIZE);
+    },
+    getFreeFrameIdx: function() {
+      const idx = this.memory.findIndex(f => !f.processId);
+      return idx > -1 ? idx : null;
+    },
+    pushToMemory: function(process) {
+      const idx = this.getFreeFrameIdx();
+      if (idx === null) throw new Error('No memory available');
+
+      this.$set(this.memory, idx, process);
+    },
+    freeMemory: function({ id }) {
+      let idx = -1;
+      do {
+        idx = this.memory.findIndex(f => f.processId === id);
+        this.$set(this.memory, idx, {});
+      } while (idx > -1);
+    },
+    addProcessToMemory: function({ size, id }) {
+      const frames = Math.floor(size / FRAME_SIZE);
+      const blocks = size % FRAME_SIZE;
+      for (let i = 0; i < frames; ++i) this.pushToMemory({ used: FRAME_SIZE, processId: id });
+      if (blocks) this.pushToMemory({ used: blocks, processId: id });
     }
   },
   computed: {
@@ -179,7 +220,18 @@ const app = new Vue({
         !this.bloquedP.length &&
         !this.finishedP.length
       );
+    },
+    processesInMemory: function() {
+      return [].concat(
+        this.readyP.map(p => ({ ...p, status: 'ready' })), 
+        this.bloquedP.map(p => ({ ...p, status: 'bloqued' })), 
+        this.runningP.map(p => ({ ...p, status: 'running' }))
+      );
     }
+  },
+  created() {
+    this.memory = Array.from({ length: TOTAL_FRAMES }, (v, i) => ({}));
+    this.addProcessToMemory({ size: OS_SIZE, id: -1 });
   },
   mounted() {
     Object.values(KEY_EVENTS).forEach(v => bus.$on(v, this[v]));
