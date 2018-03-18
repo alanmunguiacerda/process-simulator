@@ -77,7 +77,7 @@
           <h5>Ready processes <b>({{ readyP.length }})</b></h5>
           <processes-list
             :processes="readyP"
-            :columns="['id', 'remainingT', 'progress']"
+            :columns="['id', 'size', 'remainingT', 'progress']"
             :quantum="quantum"
           ></processes-list>
         </div>
@@ -85,7 +85,7 @@
           <h5>Running processes <b>({{ runningP.length }})</b></h5>
           <processes-list
             :processes="runningP"
-            :columns="['id', 'remainingT', 'opA', 'op', 'opB', 'progress']"
+            :columns="['id', 'size', 'remainingT', 'opA', 'op', 'opB', 'progress']"
             :quantum="quantum"
           ></processes-list>
         </div>
