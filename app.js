@@ -143,6 +143,7 @@ const app = new Vue({
       for (let i = 0; i < this.initialNum; i++) this.addNewProcess();
     },
     restartSimulation: function() {
+      this.pauseSimulation();
       this.nextId = 1;
       this.newP = [];
       this.readyP = [];
@@ -154,7 +155,7 @@ const app = new Vue({
       this.quantum = 1;
       this.numberError = '';
       this.quantumError = '';
-      this.pauseSimulation();
+      this.setupMemory();
     },
     tickTime: function() {
       this.time += TICK_VALUE;
@@ -176,6 +177,10 @@ const app = new Vue({
     },
 
     // Memory stuff
+    setupMemory: function() {
+      this.memory = Array.from({ length: TOTAL_FRAMES }, (v, i) => ({}));
+      this.addProcessToMemory({ size: OS_SIZE, id: -1 });
+    },
     getFreeFrames: function() {
       return this.memory.filter(f => !f.processId);
     },
@@ -230,8 +235,7 @@ const app = new Vue({
     }
   },
   created() {
-    this.memory = Array.from({ length: TOTAL_FRAMES }, (v, i) => ({}));
-    this.addProcessToMemory({ size: OS_SIZE, id: -1 });
+    this.setupMemory();
   },
   mounted() {
     Object.values(KEY_EVENTS).forEach(v => bus.$on(v, this[v]));
