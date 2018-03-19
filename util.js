@@ -26,9 +26,9 @@ const getNewProcess = () => ({
   maxTime: getRandomInt(5,15),  // Max exec time
   elapsedT: 0,               // Time running
   bloquedT: 0,               // Time bloqued
-  arrivalT: 0,               // Arrival time
+  arrivalT: -1,               // Arrival time
   finishT: 0,                // Finish time
-  entryT: 0,                 // First arrival to processor
+  entryT: -1,                 // First arrival to processor
   waitingT: 0,               // Waiting time
 });
 

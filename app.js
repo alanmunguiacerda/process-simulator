@@ -36,7 +36,7 @@ const app = new Vue({
       this.readyP = this.readyP.map(this.updateReadyProcess);
       while (this.canAddToReady()) {
         const nextProcess = this.newP.shift();
-        nextProcess.arrivalT = this.time;
+        (nextProcess.arrivalT !== -1) || (nextProcess.arrivalT = this.time);
         this.readyP.push(nextProcess);
       }
     },
@@ -53,13 +53,13 @@ const app = new Vue({
       this.runningP = this.runningP.map(this.updateRunningProcess).filter(p => !!p);
       while (this.canAddToRunning()) {
         const p = this.readyP.shift();
-        p.entryT = p.entryT || this.time;
+        (p.entryT !== -1) || (p.entryT = this.time);
         this.runningP.push(p);
       }
     },
     updateRunningProcess: function(p) {
       if (this.shouldProcessBeFinished(p)) {
-        this.finishedP.push({ ...p, finishT: this.time });
+        this.finishedP.push({ ...p, finishT: this.time - 0.1 });
         return null;
       }
       return { ...p, elapsedT: p.elapsedT + TICK_VALUE };

@@ -27,7 +27,7 @@ const processesListTemplate = `
         <td v-if="shouldShow('finishT')">{{ p.finishT | toFixed }}</td>
         <td v-if="shouldShow('returnT')">{{ getReturnTime(p) | toFixed }}</td>
         <td v-if="shouldShow('entryT')">{{ getResponseTime(p) | toFixed }}</td>
-        <td v-if="shouldShow('waitingT')">{{ p.waitingT | toFixed }}</td>
+        <td v-if="shouldShow('waitingT')">{{ getWaitingTime(p) | toFixed }}</td>
         <td v-if="shouldShow('maxTime')">{{ p.maxTime | toFixed }}</td>
         <td v-if="shouldShow('elapsedT')">{{ p.elapsedT | toFixed }}</td>
         <td v-if="shouldShow('remainingT')">{{ getRemainingTime(p) | toFixed }}</td>
@@ -66,6 +66,9 @@ Vue.component('processes-list', {
     },
     getResponseTime: function(p) {
       return p.entryT - p.arrivalT;
+    },
+    getWaitingTime: function(p) {
+      return p.finishT - p.arrivalT - p.elapsedT;
     },
     shouldShow: function(attr) {
       return this.columns.includes(attr);
