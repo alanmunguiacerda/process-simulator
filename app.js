@@ -6,7 +6,7 @@ const KEY_EVENTS = {
   n: 'addNewProcess',
   t: 'showProcessTable',
   m: 'showMemoryTable',
-  s: 'suspendRunningProcess',
+  s: 'suspendInterruptedProcess',
   r: 'retrieveSuspendedProcess',
 };
 
@@ -246,7 +246,7 @@ const app = new Vue({
       this.setSuspendedProcesses(suspendedP);
       return firstP;
     },
-    suspendRunningProcess: function() {
+    suspendInterruptedProcess: function() {
       if (!this.bloquedP.length) return;
 
       const bloqued = this.bloquedP.shift();
