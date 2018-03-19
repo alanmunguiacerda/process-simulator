@@ -75,8 +75,9 @@
             ></processes-list>
           </div>
           <div class="row">
-            <h5>Suspended processes <b>({{ totalSuspended }})</b></h5>
-            <h5>Restored processes <b>({{ restoredP.length }})</b></h5>
+            <h5>
+              Suspended <b>({{ totalSuspended }}). </b> Restored <b>({{ restoredP.length }})</b>
+            </h5>
           </div>
           <div class="row">
             <processes-list
@@ -122,10 +123,20 @@
         <div slot="body">
           <div class="row">
             <div class="column">
+              <h5>
+                Suspended <b>({{ totalSuspended }}). </b> Restored <b>({{ restoredP.length }})</b>
+              </h5>
+              <processes-list
+              :processes="restoredP"
+              :columns="['id', 'size', 'maxTime', 'remainingT']"
+              :quantum="quantum"
+              ></processes-list>
+            </div>
+            <div class="column">
               <h5>New processes <b>({{ newP.length }})</b></h5>
               <processes-list
                 :processes="newP"
-                :columns="['id', 'maxTime', 'op']"
+                :columns="['id', 'size', 'maxTime', 'op']"
                 :quantum="quantum"
               ></processes-list>
             </div>
@@ -133,25 +144,25 @@
               <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
               <processes-list
                 :processes="bloquedP"
-                :columns="['id', 'bloquedT']"
-                :quantum="quantum"
-              ></processes-list>
-            </div>
-            <div class="column">
-              <h5>Ready processes <b>({{ readyP.length }})</b></h5>
-              <processes-list
-                :processes="readyP"
-                :columns="['id', 'maxTime', 'remainingT']"
+                :columns="['id', 'size', 'bloquedT']"
                 :quantum="quantum"
               ></processes-list>
             </div>
           </div>
           <div class="row">
+            <div class="column column-40">
+              <h5>Ready processes <b>({{ readyP.length }})</b></h5>
+              <processes-list
+                :processes="readyP"
+                :columns="['id', 'size', 'maxTime', 'remainingT']"
+                :quantum="quantum"
+              ></processes-list>
+            </div>
             <div class="column">
               <h5>Running processes <b>({{ runningP.length }})</b></h5>
               <processes-list
                 :processes="runningP"
-                :columns="['id', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
+                :columns="['id', 'size', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
                 :quantum="quantum"
               ></processes-list>
             </div>
