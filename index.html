@@ -1,7 +1,7 @@
 <doctype HTML>
 <html>
   <head>
-    <title>ACT 15</title>
+    <title>ACT 16</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/styles/fonts.css">
     <link rel="stylesheet" href="/styles/normalize.css">
@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/styles/index.css">
   </head>
   <body class="container">
-    <h1>Suspended processes</h1>
+    <h1>Virtual memory</h1>
     <div class="divisor"></div>
 
     <div id="app">
@@ -49,14 +49,6 @@
       </div>
       <div class="row">
         <div class="column">
-          <h5>New processes <b>({{ newP.length }})</b></h5>
-          <processes-list
-            :processes="newP"
-            :columns="['id', 'size', 'maxTime', 'op']"
-            :quantum="quantum"
-          ></processes-list>
-        </div>
-        <div class="column column-50">
           <h5>Memory <b>({{ processesInMemory.length }})</b></h5>
           <memory
             :memory="memory"
@@ -64,6 +56,41 @@
           ></memory>
         </div>
         <div class="column">
+          <h5>Virtual memory</h5>
+          <memory
+            :memory="virtualMemory"
+            :processes="processesInMemory"
+          ></memory>
+        </div>
+      </div>
+      <div class="row">
+        <div class="column">
+          <div class="row">
+            <div class="column">
+              <h5>
+                Suspended <b>({{ totalSuspended }}). </b> Restored <b>({{ restoredP.length }})</b>
+              </h5>
+            </div>
+          </div>
+          <div class="row">
+            <div class="column">
+              <processes-list
+              :processes="restoredP"
+              :columns="['id', 'size', 'maxTime', 'remainingT']"
+              :quantum="quantum"
+              ></processes-list>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <h5>New processes <b>({{ newP.length }})</b></h5>
+          <processes-list
+            :processes="newP"
+            :columns="['id', 'size', 'maxTime', 'op']"
+            :quantum="quantum"
+          ></processes-list>
+        </div>
+        <div class="column column-25">
           <div class="row">
             <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
           </div>
@@ -74,22 +101,10 @@
               :quantum="quantum"
             ></processes-list>
           </div>
-          <div class="row">
-            <h5>
-              Suspended <b>({{ totalSuspended }}). </b> Restored <b>({{ restoredP.length }})</b>
-            </h5>
-          </div>
-          <div class="row">
-            <processes-list
-              :processes="restoredP"
-              :columns="['id', 'size', 'maxTime', 'remainingT']"
-              :quantum="quantum"
-            ></processes-list>
-          </div>
         </div>
       </div>
       <div class="row">
-        <div class="column">
+        <div class="column column-40">
           <h5>Ready processes <b>({{ readyP.length }})</b></h5>
           <processes-list
             :processes="readyP"
@@ -127,9 +142,9 @@
                 Suspended <b>({{ totalSuspended }}). </b> Restored <b>({{ restoredP.length }})</b>
               </h5>
               <processes-list
-                :processes="restoredP"
-                :columns="['id', 'size', 'maxTime', 'remainingT']"
-                :quantum="quantum"
+              :processes="restoredP"
+              :columns="['id', 'size', 'maxTime', 'remainingT']"
+              :quantum="quantum"
               ></processes-list>
             </div>
             <div class="column">
@@ -182,12 +197,20 @@
       </modal>
       
       <modal v-if="showMemoryModal">
-        <h3 slot="header">Memory <b>({{ processesInMemory.length }})</b></h3>
+        <h3 slot="header">Memory</h3>
         <div slot="body">
           <div class="row">
             <div class="column">
+              <h5>Memory <b>({{ processesInMemory.length }})</b></h5>
               <memory
                 :memory="memory"
+                :processes="processesInMemory"
+              ></memory>
+            </div>
+            <div class="column">
+              <h5>Virtual memory</h5>
+              <memory
+                :memory="virtualMemory"
                 :processes="processesInMemory"
               ></memory>
             </div>

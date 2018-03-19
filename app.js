@@ -8,6 +8,7 @@ const KEY_EVENTS = {
   m: 'showMemoryTable',
   s: 'suspendInterruptedProcess',
   r: 'retrieveSuspendedProcess',
+  u: 'unloadLastMemPage',
 };
 
 const bus = new Vue();
@@ -33,6 +34,7 @@ const app = new Vue({
     timerInterval: null,
     quantum: 1,
     memory: [],
+    virtualMemory: [],
   },
   methods: {
     addNewProcess: function() {
@@ -72,6 +74,7 @@ const app = new Vue({
       this.runningP = this.runningP.map(this.updateRunningProcess).filter(p => !!p);
       while (this.canAddToRunning()) {
         const p = this.readyP.shift();
+        this.loadProcFromVirtualMemory(p);
         (p.entryT !== -1) || (p.entryT = this.time);
         this.runningP.push(p);
       }
@@ -169,6 +172,7 @@ const app = new Vue({
       this.numberError = '';
       this.quantumError = '';
       this.setupMemory();
+      this.setupVirtualMemory();
       localStorage.clear();
     },
     tickTime: function() {
@@ -195,27 +199,27 @@ const app = new Vue({
       this.memory = Array.from({ length: TOTAL_FRAMES }, (v, i) => ({}));
       this.addProcessToMemory({ size: OS_SIZE, id: -1 });
     },
-    getFreeFrames: function() {
-      return this.memory.filter(f => !f.processId);
+    getFreeFrames: function(memory = this.memory) {
+      return memory.filter(f => !f.processId);
     },
-    procFitsInMemory: function(process) {
-      return this.getFreeFrames().length >= Math.ceil(process.size / FRAME_SIZE);
+    procFitsInMemory: function({ size }, memory = this.memory) {
+      return this.getFreeFrames(memory).length >= Math.ceil(size / FRAME_SIZE);
     },
-    getFreeFrameIdx: function() {
-      const idx = this.memory.findIndex(f => !f.processId);
+    getFreeFrameIdx: function(memory = this.memory) {
+      const idx = memory.findIndex(f => !f.processId);
       return idx > -1 ? idx : null;
     },
-    pushToMemory: function(process) {
-      const idx = this.getFreeFrameIdx();
+    pushToMemory: function(frame, memory = this.memory) {
+      const idx = this.getFreeFrameIdx(memory);
       if (idx === null) throw new Error('No memory available');
 
-      this.$set(this.memory, idx, process);
+      this.$set(memory, idx, frame);
     },
-    freeMemory: function({ id }) {
+    freeMemory: function({ id }, memory = this.memory) {
       let idx = -1;
       do {
-        idx = this.memory.findIndex(f => f.processId === id);
-        this.$set(this.memory, idx, {});
+        idx = memory.findIndex(f => f.processId === id);
+        this.$set(memory, idx, {});
       } while (idx > -1);
     },
     addProcessToMemory: function({ size, id }) {
@@ -251,6 +255,7 @@ const app = new Vue({
 
       const bloqued = this.bloquedP.shift();
       this.freeMemory(bloqued);
+      this.freeMemory(bloqued, this.virtualMemory);
       this.addToSuspendedProcesses(bloqued);
     },
     retrieveSuspendedProcess: function() {
@@ -258,6 +263,47 @@ const app = new Vue({
       if (!process) return;
 
       this.restoredP.push(process);
+    },
+    
+    // Virtual memory stuff
+    setupVirtualMemory: function() {
+      this.virtualMemory = Array.from({ length: TOTAL_FRAMES }, (v, i) => ({}));
+    },
+    findProcessFramesInMemory: function({ id }, memory = this.memory) {
+      const found = [];
+      for (let idx = memory.length - 1; idx >= 0; idx--) {
+        if (memory[idx].processId === id) found.push({ idx, data: memory[idx]});
+      }
+      return found;
+    },
+    unloadLastMemPage: function() {
+      this.processesInMemory.forEach((p) => {
+        if (p.status === 'running' || !this.getFreeFrames(this.virtualMemory).length) return;
+        const processFrames = this.findProcessFramesInMemory(p);
+        if (processFrames.length < 2 ) return;
+        this.$set(this.memory, processFrames[0].idx, {});
+        this.pushToMemory(processFrames[0].data, this.virtualMemory);
+      });
+    },
+    loadProcFromVirtualMemory: function({ id, size }) {
+      const framesInVirtualMemory = this.findProcessFramesInMemory({ id }, this.virtualMemory);
+      if (!framesInVirtualMemory.length) return;
+      
+      const freeMemoryFrames = this.getFreeFrames();
+      if (framesInVirtualMemory.length > freeMemoryFrames.length) {
+        let framesNeeded = framesInVirtualMemory.length - freeMemoryFrames.length;
+        while (framesNeeded > 0) {
+          const lastReady = this.readyP.pop();
+          const framesInMemory = this.findProcessFramesInMemory(lastReady);
+          this.freeMemory(lastReady, this.memory);
+          this.freeMemory(lastReady, this.virtualMemory);
+          this.restoredP = [lastReady, ...this.restoredP];
+          framesNeeded -= framesInMemory.length;
+        }
+      }
+
+      framesInVirtualMemory.forEach(f => this.pushToMemory(f.data));
+      this.freeMemory({ id }, this.virtualMemory);
     },
   },
   computed: {
@@ -285,6 +331,7 @@ const app = new Vue({
   },
   created() {
     this.setupMemory();
+    this.setupVirtualMemory();
     localStorage.clear();
   },
   mounted() {
