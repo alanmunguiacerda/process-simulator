@@ -6,6 +6,8 @@ const KEY_EVENTS = {
   n: 'addNewProcess',
   t: 'showProcessTable',
   m: 'showMemoryTable',
+  s: 'suspendRunningProcess',
+  r: 'retrieveSuspendedProcess',
 };
 
 const bus = new Vue();
@@ -24,6 +26,8 @@ const app = new Vue({
     runningP: [],   // Limit to 6 the sum of this lengths
     bloquedP: [],   // Limit to 6 the sum of this lengths
     finishedP: [],  // Unlimited
+    restoredP: [],  // Unlimited
+    totalSuspended: 0,
     time: 0,
     isRunning: false,
     timerInterval: null,
@@ -40,7 +44,7 @@ const app = new Vue({
     updateReadyProcesses: function() {
       this.readyP = this.readyP.map(this.updateReadyProcess);
       while (this.canAddToReady()) {
-        const nextProcess = this.newP.shift();
+        const nextProcess = this.getNextReadyP();
         (nextProcess.arrivalT !== -1) || (nextProcess.arrivalT = this.time);
         this.readyP.push(nextProcess);
         this.addProcessToMemory(nextProcess);
@@ -50,7 +54,16 @@ const app = new Vue({
       return { ...p, waitingT: p.waitingT + TICK_VALUE };
     },
     canAddToReady: function() {
+      if (this.restoredP.length) {
+        return this.procFitsInMemory(this.restoredP[0]);
+      }
       return this.newP.length && this.procFitsInMemory(this.newP[0]);
+    },
+    getNextReadyP: function() {
+      if (this.restoredP.length) {
+        return { ...this.restoredP.shift(), bloquedT: 0 };
+      }
+      return this.newP.shift();
     },
     getProcessesInMemoryCount: function() {
       return this.runningP.length + this.readyP.length + this.bloquedP.length;
@@ -156,6 +169,7 @@ const app = new Vue({
       this.numberError = '';
       this.quantumError = '';
       this.setupMemory();
+      localStorage.clear();
     },
     tickTime: function() {
       this.time += TICK_VALUE;
@@ -209,7 +223,42 @@ const app = new Vue({
       const blocks = size % FRAME_SIZE;
       for (let i = 0; i < frames; ++i) this.pushToMemory({ used: FRAME_SIZE, processId: id });
       if (blocks) this.pushToMemory({ used: blocks, processId: id });
-    }
+    },
+    
+    // Suspend stuff
+    getSuspendedProcesses: function() {
+      return JSON.parse(localStorage.getItem(SUSPENDED_PROC_KEY) || '[]');
+    },
+    setSuspendedProcesses: function(processes) {
+      this.totalSuspended = processes.length;
+      localStorage.setItem(SUSPENDED_PROC_KEY, JSON.stringify(processes));
+    },
+    addToSuspendedProcesses: function(...processes) {
+      const suspendedP = this.getSuspendedProcesses();
+      suspendedP.push(...processes);
+      this.setSuspendedProcesses(suspendedP);
+    },
+    getFirstSuspendedProcess: function() {
+      const suspendedP = this.getSuspendedProcesses();
+      if (!suspendedP.length) return null;
+
+      const firstP = suspendedP.shift();
+      this.setSuspendedProcesses(suspendedP);
+      return firstP;
+    },
+    suspendRunningProcess: function() {
+      if (!this.bloquedP.length) return;
+
+      const bloqued = this.bloquedP.shift();
+      this.freeMemory(bloqued);
+      this.addToSuspendedProcesses(bloqued);
+    },
+    retrieveSuspendedProcess: function() {
+      const process = this.getFirstSuspendedProcess();
+      if (!process) return;
+
+      this.restoredP.push(process);
+    },
   },
   computed: {
     toggleText: function() {
@@ -236,6 +285,7 @@ const app = new Vue({
   },
   created() {
     this.setupMemory();
+    localStorage.clear();
   },
   mounted() {
     Object.values(KEY_EVENTS).forEach(v => bus.$on(v, this[v]));

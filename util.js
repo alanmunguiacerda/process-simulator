@@ -8,6 +8,8 @@ const TOTAL_FRAMES = 28;
 const FRAME_SIZE = 5;
 const OS_SIZE = 10;
 
+const SUSPENDED_PROC_KEY = 'suspended_processes';
+
 const OPERATIONS = ['+', '-', '*', '/', '%'];
 
 const FRAME_COLORS = {

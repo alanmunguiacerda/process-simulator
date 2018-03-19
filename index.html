@@ -64,12 +64,27 @@
           ></memory>
         </div>
         <div class="column">
-          <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
-          <processes-list
-            :processes="bloquedP"
-            :columns="['id', 'size', 'bloquedT']"
-            :quantum="quantum"
-          ></processes-list>
+          <div class="row">
+            <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
+          </div>
+          <div class="row">
+            <processes-list
+              :processes="bloquedP"
+              :columns="['id', 'size', 'bloquedT']"
+              :quantum="quantum"
+            ></processes-list>
+          </div>
+          <div class="row">
+            <h5>Suspended processes <b>({{ totalSuspended }})</b></h5>
+            <h5>Restored processes <b>({{ restoredP.length }})</b></h5>
+          </div>
+          <div class="row">
+            <processes-list
+              :processes="restoredP"
+              :columns="['id', 'size', 'maxTime', 'remainingT']"
+              :quantum="quantum"
+            ></processes-list>
+          </div>
         </div>
       </div>
       <div class="row">
