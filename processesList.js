@@ -97,8 +97,7 @@ Vue.component('processes-list', {
       return p.entryT - p.arrivalT;
     },
     getWaitingTime: function(p) {
-      const calc = this.getReturnTime(p) - p.elapsedT;
-      return calc > 0 ? calc : p.waitingT;
+      return this.time - p.arrivalT - p.elapsedT;
     },
     getProgressTxt: function (p) {
       return `${p.elapsedT.toFixed(FX)}/${p.maxTime}`;

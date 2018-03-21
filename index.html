@@ -149,7 +149,7 @@
               </h5>
               <processes-list
               :processes="restoredP"
-              :columns="['id', 'size', 'maxTime', 'remainingT']"
+              :columns="['id', 'size', 'maxTime', 'remainingT', 'waitingT']"
               :quantum="quantum"
               :time="time"
               ></processes-list>
@@ -163,11 +163,13 @@
                 :time="time"
               ></processes-list>
             </div>
+          </div>
+          <div class='row'>
             <div class="column">
               <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
               <processes-list
                 :processes="bloquedP"
-                :columns="['id', 'size', 'arrivalT', 'entryT', 'maxTime',
+                :columns="['id', 'size', 'arrivalT', 'entryT', 'maxTime', 'waitingT',
                 'elapsedT', 'remainingT', 'opA', 'op', 'opB', 'bloquedT']"
                 :quantum="quantum"
                 :time="time"
