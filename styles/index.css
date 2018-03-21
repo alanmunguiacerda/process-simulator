@@ -56,9 +56,12 @@ h5 {
 }
 .frame-number {
   border-right: 1px solid #606c76;
+  padding: 0 1px;
 }
 .frame-block {
   flex: 1;
   text-align: center;
   margin: 1px;
+  font-size: 12px;
+  line-height: 12px;
 }

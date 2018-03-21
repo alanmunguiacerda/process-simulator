@@ -94,6 +94,7 @@ Vue.component('processes-list', {
       return p.finishT - p.arrivalT;
     },
     getResponseTime: function(p) {
+      if (p.entryT < 0) return -1;
       return p.entryT - p.arrivalT;
     },
     getWaitingTime: function(p) {

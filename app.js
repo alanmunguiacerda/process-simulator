@@ -47,7 +47,9 @@ const app = new Vue({
       this.readyP = this.readyP.map(this.updateReadyProcess);
       while (this.canAddToReady()) {
         const nextProcess = this.getNextReadyP();
-        (nextProcess.arrivalT === -1) && (nextProcess.arrivalT = this.time);
+        if (nextProcess.arrivalT < 0) {
+          nextProcess.arrivalT = this.time;
+        }
         this.readyP.push(nextProcess);
         this.addProcessToMemory(nextProcess);
       }
@@ -79,7 +81,9 @@ const app = new Vue({
       while (this.canAddToRunning()) {
         const p = this.readyP.shift();
         this.loadProcFromVirtualMemory(p);
-        (p.entryT === -1) && (p.entryT = this.time);
+        if (p.entryT < 0) {
+          p.entryT = this.time;
+        }
         this.runningP.push(p);
       }
     },
