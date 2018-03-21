@@ -132,7 +132,7 @@
           ></processes-list>
         </div>
       </div>
-      
+
       <modal v-if="showProcessModal">
         <h3 slot="header">Process list</h3>
         <div slot="body">
@@ -159,25 +159,30 @@
               <h5>Bloqued processes <b>({{ bloquedP.length }})</b></h5>
               <processes-list
                 :processes="bloquedP"
-                :columns="['id', 'size', 'bloquedT']"
+                :columns="['id', 'size', 'arrivalT', 'entryT', 'maxTime',
+                'elapsedT', 'remainingT', 'opA', 'op', 'opB', 'bloquedT']"
                 :quantum="quantum"
               ></processes-list>
             </div>
           </div>
           <div class="row">
-            <div class="column column-40">
+            <div class="column">
               <h5>Ready processes <b>({{ readyP.length }})</b></h5>
               <processes-list
                 :processes="readyP"
-                :columns="['id', 'size', 'maxTime', 'remainingT']"
+                :columns="['id', 'size', 'arrivalT', 'entryT', 'waitingT', 'maxTime',
+                'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
                 :quantum="quantum"
               ></processes-list>
             </div>
+          </div>
+          <div class="row">
             <div class="column">
               <h5>Running processes <b>({{ runningP.length }})</b></h5>
               <processes-list
                 :processes="runningP"
-                :columns="['id', 'size', 'maxTime', 'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
+                :columns="['id', 'size', 'arrivalT', 'entryT', 'waitingT', 'maxTime',
+                'elapsedT', 'remainingT', 'opA', 'op', 'opB']"
                 :quantum="quantum"
               ></processes-list>
             </div>
@@ -195,7 +200,7 @@
           </div>
         </div>
       </modal>
-      
+
       <modal v-if="showMemoryModal">
         <h3 slot="header">Memory</h3>
         <div slot="body">

@@ -45,11 +45,11 @@ const processesListTemplate = `
         <td v-if="shouldShow('result')">{{ getResult(p) | toFixed(3) }}</td>
         <td v-if="shouldShow('progress')">
           <div class="progressbar">
-            <div 
-              :style="{ 
+            <div
+              :style="{
                 width: (p.elapsedT / p.maxTime * 100) + '%',
                 'font-size': '14px',
-              }" 
+              }"
               :data-label="getProgressTxt(p)"
             >
             </div>
@@ -57,9 +57,9 @@ const processesListTemplate = `
         </td>
         <td v-if="shouldShow('progress')">
         <div class="progressbar">
-          <div 
+          <div
             :style="{
-              width: (p.quantumT / quantum * 100) + '%', 
+              width: (p.quantumT / quantum * 100) + '%',
               'background-color': '#42b983',
               'font-size': '14px',
             }"
@@ -97,7 +97,8 @@ Vue.component('processes-list', {
       return p.entryT - p.arrivalT;
     },
     getWaitingTime: function(p) {
-      return p.finishT - p.arrivalT - p.elapsedT;
+      const calc = this.getReturnTime(p) - p.elapsedT;
+      return calc > 0 ? calc : p.waitingT;
     },
     getProgressTxt: function (p) {
       return `${p.elapsedT.toFixed(FX)}/${p.maxTime}`;
