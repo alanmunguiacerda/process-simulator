@@ -76,7 +76,7 @@ const processesListTemplate = `
 
 Vue.component('processes-list', {
   template: processesListTemplate,
-  props: ['processes', 'columns', 'quantum'],
+  props: ['processes', 'columns', 'quantum', 'time'],
   methods: {
     deleteProcess: function(processId) {
       this.$emit('delete-process', processId);
